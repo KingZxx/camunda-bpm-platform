@@ -1,26 +1,21 @@
-import groovy.json.JsonSlurper
-
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
 @Library(['camunda-ci', 'cambpm-jenkins-shared-library']) _
 
-String getAgent(String dockerImage = 'gcr.io/ci-30-162810/centos:v0.4.6', Integer cpuLimit = 4){
-  String mavenForkCount = cpuLimit;
-  String mavenMemoryLimit = cpuLimit * 2;
+String getAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
+  Map dbInfo = getDbInfo(dbLabel)
+  String mavenMemoryLimit = cpuLimit * 4;
   """
 metadata:
   labels:
-    agent: ci-cambpm-camunda-cloud-build
+    name: "jenkins-slave-cockroachdb"
+    feature: "cockroachdb_20.1v0.1.3"
+    jenkins: "slave"
+    jenkins/label: "cockroachdb_201"
 spec:
-  nodeSelector:
-    cloud.google.com/gke-nodepool: agents-n1-standard-32-netssd-preempt
-  tolerations:
-  - key: "agents-n1-standard-32-netssd-preempt"
-    operator: "Exists"
-    effect: "NoSchedule"
   containers:
   - name: "jnlp"
-    image: "${dockerImage}"
+    image: "gcr.io/ci-30-162810/cockroachdb:20.1v0.1.3"
     args: ['\$(JENKINS_SECRET)', '\$(JENKINS_NAME)']
     tty: true
     env:
@@ -30,15 +25,25 @@ spec:
       value: Europe/Berlin
     resources:
       limits:
-        cpu: ${cpuLimit}
-        memory: ${mavenMemoryLimit}Gi
+        memory: "2Gi"
       requests:
-        cpu: ${cpuLimit}
-        memory: ${mavenMemoryLimit}Gi
-    workingDir: "/home/work"
+        cpu: "1000m"
+        memory: "2Gi"
     volumeMounts:
-      - mountPath: /home/work
-        name: workspace-volume
+    - mountPath: "/home/work"
+      name: "workspace-volume"
+    workingDir: "/home/work"
+    nodeSelector:
+      cloud.google.com/gke-nodepool: "agents-n1-standard-4-netssd-preempt"
+    restartPolicy: "Never"
+    tolerations:
+    - effect: "NoSchedule"
+      key: "agents-n1-standard-4-netssd-preempt"
+      operator: "Exists"
+    volumes:
+    - emptyDir:
+        medium: ""
+      name: "workspace-volume"
   """
 }
 
@@ -58,7 +63,9 @@ pipeline {
   stages {
     stage('Prepare') {
       when {
-        expression { params.STANDALONE == false }
+        expression {
+          cambpmWithLabels('standalone')
+        }
         beforeAgent true
       }
       agent {
@@ -86,7 +93,7 @@ pipeline {
         }
         when {
           expression {
-            withLabels(getLabels(env.PROFILE))
+            cambpmWithLabelsArray(getLabels(env.PROFILE))
           }
           beforeAgent true
         }
@@ -143,38 +150,6 @@ void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, Stri
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
   }
-}
-
-boolean withLabels(List labels) {
-  if (params.STANDALONE && pullRequest.labels.contains('TODO')) {
-  //if (params.STANDALONE && pullRequest.labels.contains('no-build')) {
-    return false;
-  }
-
-  if (env.BRANCH_NAME == cambpmDefaultBranch()) {
-    return true;
-  } else if (!params.STANDALONE) {
-    for (l in labels) {
-      if (new JsonSlurper().parseText(params.PR_LABELS).contains(l)) {
-        return true;
-      }
-    }
-  } else {
-    for (l in labels) {
-      if (pullRequest.labels.contains(l)) {
-        return true;  
-      }
-    }
-  }
-  return false;
-}
-
-boolean withLabels(String... labels) {
-  return withLabels(Arrays.asList(labels));
-}
-
-boolean withDbLabels(String dbLabel) {
-  return withLabels(cambpmGetDbType(dbLabel));
 }
 
 String resolveMavenProfileInfo(String profile) {
