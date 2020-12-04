@@ -152,7 +152,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('engine-unit'), getMavenProfileCmd('engine-unit') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, cambpmGetMavenTargetDir('engine-unit'), cambpmGetMavenTargetAndProfile('engine-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -180,7 +180,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('engine-unit-authorizations'), getMavenProfileCmd('engine-unit-authorizations') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, cambpmGetMavenTargetDir('engine-unit-authorizations'), cambpmGetMavenTargetAndProfile('engine-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -258,7 +258,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit'), getMavenProfileCmd('webapps-unit') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, cambpmGetMavenTargetDir('webapps-unit'), cambpmGetMavenTargetAndProfile('webapps-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -285,7 +285,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit-authorizations'), getMavenProfileCmd('webapps-unit-authorizations') + cambpmGetDbProfiles('h2'))
+                runMaven(true, false, false, cambpmGetMavenTargetDir('webapps-unit-authorizations'), cambpmGetMavenTargetAndProfile('webapps-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -464,7 +464,7 @@ pipeline {
         }
         when {
           expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && (withLabels(getLabels(env.PROFILE)) || withDbLabels(env.DB))
+            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && (withLabels(cambpmGetLabels(env.PROFILE, 'cockroachdb'))
           }
           beforeAgent true
         }
@@ -479,7 +479,7 @@ pipeline {
               echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, false, getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  runMaven(true, false, false, cambpmGetMavenTargetDir(env.PROFILE), cambpmGetMavenTargetAndProfile(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -784,39 +784,4 @@ spec:
         medium: ""
       name: "workspace-volume"
   """
-}
-
-String resolveMavenProfileInfo(String profile) {
-  Map PROFILE_PATHS = [
-      'engine-unit': [
-          directory: 'engine/',
-          command: 'clean test -P',
-          labels: ['authorizations']],
-      'engine-unit-authorizations': [
-          directory: 'engine/',
-          command: 'clean test -PcfgAuthorizationCheckRevokesAlways,',
-          labels: ['authorizations']],
-      'webapps-unit': [
-          directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -P',
-          labels: ['default-build']],
-      'webapps-unit-authorizations': [
-          directory: 'webapps/',
-          command: 'clean test -Dskip.frontend.build=true -PcfgAuthorizationCheckRevokesAlways,',
-          labels: ['default-build']]
-  ]
-
-  return PROFILE_PATHS[profile]
-}
-
-String getMavenProfileCmd(String profile) {
-  return resolveMavenProfileInfo(profile).command
-}
-
-String getMavenProfileDir(String profile) {
-  return resolveMavenProfileInfo(profile).directory
-}
-
-String[] getLabels(String profile) {
-  return resolveMavenProfileInfo(profile).labels
 }
