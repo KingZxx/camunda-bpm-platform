@@ -417,7 +417,7 @@ pipeline {
         axes {
           axis {
             name 'DB'
-            values 'postgresql_96', 'postgresql_94', 'postgresql_107', 'postgresql_112', 'postgresql_122', 'cockroachdb_201', 'mariadb_100', 'mariadb_102', 'mariadb_103', 'mariadb_galera', 'mysql_57', 'oracle_11', 'oracle_12', 'oracle_18', 'oracle_19', 'db2_105', 'db2_111', 'sqlserver_2017', 'sqlserver_2019'
+            values 'postgresql_96', 'postgresql_94', 'postgresql_107'
           }
           axis {
             name 'PROFILE'
