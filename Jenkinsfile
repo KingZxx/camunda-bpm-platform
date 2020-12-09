@@ -464,7 +464,7 @@ pipeline {
         }
         when {
           expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && (withLabels(cambpmGetLabels(env.PROFILE, 'cockroachdb'))
+            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && withLabels(cambpmGetLabels(env.PROFILE, 'cockroachdb'))
           }
           beforeAgent true
         }
