@@ -138,7 +138,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('check-sql'), getMavenProfileDir('check-sql'), getMavenProfileCmd('check-sql') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, isQaStashEnabled('check-sql'), getMavenProfileDir('check-sql'), getMavenProfileCmd('check-sql') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -163,7 +163,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('upgrade-db'), getMavenProfileDir('upgrade-db'), getMavenProfileCmd('upgrade-db') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, isQaStashEnabled('upgrade-db'), getMavenProfileDir('upgrade-db'), getMavenProfileCmd('upgrade-db') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -191,7 +191,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('instance-migration'), getMavenProfileDir('instance-migration'), getMavenProfileCmd('instance-migration') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, isQaStashEnabled('instance-migration'), getMavenProfileDir('instance-migration'), getMavenProfileCmd('instance-migration') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -219,7 +219,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('old-engine'), getMavenProfileDir('old-engine'), getMavenProfileCmd('old-engine') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, isQaStashEnabled('old-engine'), getMavenProfileDir('old-engine'), getMavenProfileCmd('old-engine') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -247,7 +247,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('rolling-update'), getMavenProfileDir('rolling-update'), getMavenProfileCmd('rolling-update') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, isQaStashEnabled('rolling-update'), getMavenProfileDir('rolling-update'), getMavenProfileCmd('rolling-update') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -273,7 +273,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, isQaStashEnabled('large-data-tests'), getMavenProfileDir('large-data-tests'), getMavenProfileCmd('large-data-tests') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, isQaStashEnabled('large-data-tests'), getMavenProfileDir('large-data-tests'), getMavenProfileCmd('large-data-tests') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -317,7 +317,7 @@ pipeline {
               echo("QA DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  cambpmRunMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -354,7 +354,7 @@ pipeline {
             steps {
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: env.JDK, maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, false, '.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly')
+                  cambpmRunMaven(true, false, false, '.', 'install source:jar source:test-jar -pl \'!webapps\',\'!distro/jbossas7/subsystem\' -Pdistro,distro-ce,distro-wildfly')
                 }
               }
             }
@@ -387,17 +387,6 @@ pipeline {
     }
   }
 }
-
-void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
-  if (!params.STANDALONE && runtimeStash) unstash "platform-stash-runtime"
-  if (!params.STANDALONE && archivesStash) unstash "platform-stash-archives"
-  if (!params.STANDALONE && qaStash) unstash "platform-stash-qa"
-  String forkCount = singleThreaded? "-DforkCount=1" : '';
-  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
-  }
-}
-
 
 boolean withLabels(List labels) {
   if (params.STANDALONE && env.BRANCH_NAME != cambpmDefaultBranch() && pullRequest.labels.contains('no-build')) {

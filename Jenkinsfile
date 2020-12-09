@@ -152,7 +152,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('engine-unit'), getMavenProfileCmd('engine-unit') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, false, getMavenProfileDir('engine-unit'), getMavenProfileCmd('engine-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -180,7 +180,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('engine-unit-authorizations'), getMavenProfileCmd('engine-unit-authorizations') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, false, getMavenProfileDir('engine-unit-authorizations'), getMavenProfileCmd('engine-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -208,7 +208,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'engine-rest/engine-rest/', 'clean install -Pjersey2')
+                cambpmRunMaven(true, false, false, 'engine-rest/engine-rest/', 'clean install -Pjersey2')
               }
             }
           }
@@ -233,7 +233,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'engine-rest/engine-rest/', 'clean install -Presteasy3')
+                cambpmRunMaven(true, false, false, 'engine-rest/engine-rest/', 'clean install -Presteasy3')
               }
             }
           }
@@ -258,7 +258,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit'), getMavenProfileCmd('webapps-unit') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, false, getMavenProfileDir('webapps-unit'), getMavenProfileCmd('webapps-unit') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -285,7 +285,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, getMavenProfileDir('webapps-unit-authorizations'), getMavenProfileCmd('webapps-unit-authorizations') + cambpmGetDbProfiles('h2'))
+                cambpmRunMaven(true, false, false, getMavenProfileDir('webapps-unit-authorizations'), getMavenProfileCmd('webapps-unit-authorizations') + cambpmGetDbProfiles('h2'))
               }
             }
           }
@@ -313,7 +313,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, false, 'qa/', 'clean install -Ptomcat,postgresql,engine-integration')
+                cambpmRunMaven(true, true, false, 'qa/', 'clean install -Ptomcat,postgresql,engine-integration')
               }
             }
           }
@@ -337,7 +337,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, false, 'qa/', 'clean install -Pwildfly,postgresql,engine-integration')
+                cambpmRunMaven(true, true, false, 'qa/', 'clean install -Pwildfly,postgresql,engine-integration')
               }
             }
           }
@@ -365,7 +365,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, false, 'qa/', 'clean install -Ptomcat,h2,webapps-integration')
+                cambpmRunMaven(true, true, false, 'qa/', 'clean install -Ptomcat,h2,webapps-integration')
               }
             }
           }
@@ -388,7 +388,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, false, 'qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa')
+                cambpmRunMaven(true, true, false, 'qa/', 'clean install -Pwildfly-vanilla,webapps-integration-sa')
               }
             }
           }
@@ -413,7 +413,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, true, 'distro/run/', 'clean install -Pintegration-test-camunda-run')
+                cambpmRunMaven(true, true, true, 'distro/run/', 'clean install -Pintegration-test-camunda-run')
               }
             }
           }
@@ -438,7 +438,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, true, 'spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter')
+                cambpmRunMaven(true, true, true, 'spring-boot-starter/', 'clean install -Pintegration-test-spring-boot-starter')
               }
             }
           }
@@ -479,7 +479,7 @@ pipeline {
               echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, false, getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  cambpmRunMaven(true, false, false, getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -512,7 +512,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'engine/', 'clean verify -Pcheck-api-compatibility')
+                cambpmRunMaven(true, false, false, 'engine/', 'clean verify -Pcheck-api-compatibility')
               }
             }
           }
@@ -540,7 +540,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'engine/', 'clean test -Pcheck-plugins')
+                cambpmRunMaven(true, false, false, 'engine/', 'clean test -Pcheck-plugins')
               }
             }
           }
@@ -565,7 +565,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, 'engine/', 'clean test -Pdb-table-prefix')
+                cambpmRunMaven(true, false, false, 'engine/', 'clean test -Pdb-table-prefix')
               }
             }
           }
@@ -594,7 +594,7 @@ pipeline {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
                 nodejs('nodejs-14.6.0') {
-                  runMaven(true, false, false, 'webapps/', 'clean test -Pdb-table-prefix')
+                  cambpmRunMaven(true, false, false, 'webapps/', 'clean test -Pdb-table-prefix')
                 }
               }
             }
@@ -623,7 +623,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, false, false, '.', 'clean verify -Pcheck-engine,wls-compatibility,jersey')
+                cambpmRunMaven(true, false, false, '.', 'clean verify -Pcheck-engine,wls-compatibility,jersey')
               }
             }
           }
@@ -648,7 +648,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, false, 'qa/', 'clean install -Pwildfly-domain,h2,engine-integration')
+                cambpmRunMaven(true, true, false, 'qa/', 'clean install -Pwildfly-domain,h2,engine-integration')
               }
             }
           }
@@ -673,7 +673,7 @@ pipeline {
           steps {
             catchError(stageResult: 'FAILURE') {
               withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                runMaven(true, true, true, 'qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration')
+                cambpmRunMaven(true, true, true, 'qa/', 'clean install -Pwildfly,wildfly-servlet,h2,engine-integration')
               }
             }
           }
@@ -703,16 +703,6 @@ pipeline {
         }
       }
     }
-  }
-}
-
-void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
-  if (runtimeStash) unstash "platform-stash-runtime"
-  if (archivesStash) unstash "platform-stash-archives"
-  if (qaStash) unstash "platform-stash-qa"
-  String forkCount = singleThreaded? "-DforkCount=1" : '';
-  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2  -f ${directory}/pom.xml -B")
   }
 }
 

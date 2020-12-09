@@ -101,7 +101,7 @@ pipeline {
               echo("UNIT DB Test Stage: ${env.PROFILE}-${env.DB}")
               catchError(stageResult: 'FAILURE') {
                 withMaven(jdk: 'jdk-8-latest', maven: 'maven-3.2-latest', mavenSettingsConfig: 'camunda-maven-settings', options: [artifactsPublisher(disabled: true), junitPublisher(disabled: true)]) {
-                  runMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
+                  cambpmRunMaven(true, false, isQaStashEnabled(env.PROFILE), getMavenProfileDir(env.PROFILE), getMavenProfileCmd(env.PROFILE) + cambpmGetDbProfiles(env.DB) + " " + cambpmGetDbExtras(env.DB), true)
                 }
               }
             }
@@ -132,16 +132,6 @@ pipeline {
         }
       }
     }
-  }
-}
-
-void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
-  if (!params.STANDALONE && runtimeStash) unstash "platform-stash-runtime"
-  if (!params.STANDALONE && archivesStash) unstash "platform-stash-archives"
-  if (!params.STANDALONE && qaStash) unstash "platform-stash-qa"
-  String forkCount = singleThreaded? "-DforkCount=1" : '';
-  configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
-    sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2 -B -f ${directory}/pom.xml")
   }
 }
 
