@@ -1,6 +1,6 @@
 // https://github.com/camunda/jenkins-global-shared-library
 // https://github.com/camunda/cambpm-jenkins-shared-library
-@Library(['camunda-ci', 'cambpm-jenkins-shared-library@pipeline-extract-stashing']) _
+@Library(['camunda-ci', 'cambpm-jenkins-shared-library@pipeline-extract-artifact-logic']) _
 
 String getAgent(String dbLabel, Integer cpuLimit = 4, Integer mavenForkCount = 1){
   Map dbInfo = getDbInfo(dbLabel)
@@ -74,7 +74,7 @@ pipeline {
         }
       }
       steps {
-        copyArtifacts(projectName: "cambpm-ce/cambpm-main/${env.BRANCH_NAME}", fingerprintArtifacts: true, selector: buildParameter('copyArtifactSelector'), optional: true)
+        cambpmCopyArtifacts("cambpm-ce/cambpm-main/${env.BRANCH_NAME}")
         cambpmStash("platform-stash-runtime",
                     ".m2/org/camunda/**/*-SNAPSHOT/**",
                     "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
