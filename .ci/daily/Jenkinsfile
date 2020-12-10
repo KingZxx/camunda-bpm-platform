@@ -95,7 +95,7 @@ pipeline {
     stage('Prepare') {
       when {
         expression {
-          cambpmWithLabels('standalone')
+          !cambpmWithLabels('standalone')
         }
         beforeAgent true
       }
