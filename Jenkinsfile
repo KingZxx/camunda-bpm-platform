@@ -468,7 +468,7 @@ pipeline {
         }
         when {
           expression {
-            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && (cambpmWithLabelsArray(getLabels(env.PROFILE)) || cambpmWithDbLabels(env.DB))
+            cambpmIsNotFailedStageType(failedStageTypes, env.PROFILE) && (cambpmWithLabelsList(getLabels(env.PROFILE)) || cambpmWithDbLabels(env.DB))
           }
           beforeAgent true
         }

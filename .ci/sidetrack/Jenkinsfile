@@ -93,7 +93,7 @@ pipeline {
         }
         when {
           expression {
-            cambpmWithLabelsArray(getLabels(env.PROFILE))
+            cambpmWithLabelsList(getLabels(env.PROFILE))
           }
           beforeAgent true
         }
