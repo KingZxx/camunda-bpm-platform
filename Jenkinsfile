@@ -88,9 +88,14 @@ pipeline {
           archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-example-invoice*.war', followSymlinks: false
           archiveArtifacts artifacts: '.m2/org/camunda/**/*-SNAPSHOT/**/camunda-h2-webapp*.war', followSymlinks: false
 
-          stash name: "platform-stash-runtime", includes: ".m2/org/camunda/**/*-SNAPSHOT/**", excludes: "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz"
-          stash name: "platform-stash-archives", includes: ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz"
-          stash name: "platform-stash-qa", includes: ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**", excludes: "**/*.zip,**/*.tar.gz"
+          cambpmStash("platform-stash-runtime",
+                      ".m2/org/camunda/**/*-SNAPSHOT/**",
+                      "**/qa/**,**/*qa*/**,**/*.zip,**/*.tar.gz")
+          cambpmStash("platform-stash-archives",
+                      ".m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.zip,.m2/org/camunda/bpm/**/*-SNAPSHOT/**/*.tar.gz")
+          cambpmStash("platform-stash-qa",
+                      ".m2/org/camunda/bpm/**/qa/**/*-SNAPSHOT/**,.m2/org/camunda/bpm/**/*qa*/**/*-SNAPSHOT/**",
+                      "**/*.zip,**/*.tar.gz")
 
         }
         
@@ -699,9 +704,9 @@ pipeline {
 }
 
 void runMaven(boolean runtimeStash, boolean archivesStash, boolean qaStash, String directory, String cmd, boolean singleThreaded = false) {
-  if (runtimeStash) unstash "platform-stash-runtime"
-  if (archivesStash) unstash "platform-stash-archives"
-  if (qaStash) unstash "platform-stash-qa"
+  if (runtimeStash) cambpmUnstash("platform-stash-runtime")
+  if (archivesStash) cambpmUnstash("platform-stash-archives")
+  if (qaStash) cambpmUnstash("platform-stash-qa")
   String forkCount = singleThreaded? "-DforkCount=1" : '';
   configFileProvider([configFile(fileId: 'maven-nexus-settings', variable: 'MAVEN_SETTINGS_XML')]) {
     sh("mvn -s \$MAVEN_SETTINGS_XML ${forkCount} ${cmd} -nsu -Dmaven.repo.local=\${WORKSPACE}/.m2  -f ${directory}/pom.xml -B")
